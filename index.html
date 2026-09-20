@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Search Bitfoot</title>
+  <style>
+    :root { --bg:#060a10; --panel:#0b1219; --line:#42535b; --gold:#f4bd2a; --cream:#ede1c5; --green:#57d3a0; }
+    * { box-sizing:border-box; }
+    body { min-height:100vh; margin:0; padding:22px; display:grid; place-items:center; color:var(--cream); font-family:"Courier New",monospace; background:radial-gradient(circle at 50% 0,#28333b 0,transparent 31%),repeating-linear-gradient(0deg,#ffffff09 0 1px,transparent 1px 4px),var(--bg); }
+    .app { width:min(100%,490px); }
+    .intro { margin:0 0 16px; padding:16px; border:1px solid #4a5153; background:#0a1016; color:#c4cbca; font-size:13px; line-height:1.65; }
+    .intro b { color:var(--gold); font-weight:400; }
+    .top { padding:18px; border:1px solid var(--line); border-top:5px solid var(--gold); color:var(--gold); text-align:center; font-family:Impact,"Arial Black",sans-serif; font-size:37px; letter-spacing:.07em; text-shadow:3px 3px 0 #6e5111; }
+    .top small { display:block; margin-top:6px; color:#9aa19a; font:10px "Courier New",monospace; letter-spacing:.18em; text-shadow:none; }
+    .record { position:relative; overflow:hidden; padding:27px; border:1px solid var(--line); border-top:0; background:linear-gradient(135deg,#1a242955,transparent 44%),var(--panel); box-shadow:0 20px 60px #0009; }
+    .record::after { content:""; position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg,transparent 0 3px,#ffffff08 3px 4px); }
+    .inner { position:relative; z-index:1; }
+    .tag { color:#abb3ad; font-size:11px; letter-spacing:.18em; text-align:center; }
+    .head { position:relative; display:grid; width:225px; height:225px; margin:21px auto; overflow:hidden; border:2px solid var(--gold); background:#f0b92b; place-items:center; }
+    .head img { display:block; width:100%; height:100%; object-fit:contain; object-position:center; background:#f0b92b; image-rendering:pixelated; opacity:1; transition:opacity .05s linear; }
+    .scan { position:absolute; z-index:2; top:0; right:0; left:0; display:none; height:3px; background:var(--green); box-shadow:0 0 14px var(--green); }
+    .pool-ripple { position:absolute; z-index:3; inset:15px; display:none; border:1px solid var(--green); border-radius:50%; opacity:.4; }
+    .scanning .scan { display:block; animation:scan .8s linear infinite; }
+    .scanning .pool-ripple { display:block; animation:ripple 1s ease-out infinite; }
+    .scanning .head img { animation:flicker .13s infinite; }
+    .observation { margin:0; color:var(--gold); font:28px Impact,"Arial Black",sans-serif; letter-spacing:.07em; line-height:1.1; text-align:center; }
+    .observation.active { color:var(--green); text-shadow:0 0 14px #57d3a077; }
+    .handle { margin:9px 0 24px; color:#9da7a1; font-size:14px; text-align:center; }
+    .divider { margin:0 -27px 19px; border-top:1px dashed #66726d; }
+    .grid { display:grid; grid-template-columns:1fr 1.35fr; gap:13px 18px; font-size:12px; line-height:1.35; }
+    .label { color:#8e9892; letter-spacing:.12em; }
+    .value { color:#e0dfd1; font-weight:bold; text-align:right; }
+    .note-box { margin-top:20px; padding:14px; border:1px solid #46534e; background:#07100d; color:#c2cabe; font-size:13px; line-height:1.55; }
+    .handle-box { margin-top:15px; padding:14px; border:1px solid #46534e; background:#09100f; }
+    .handle-box label { display:block; margin-bottom:9px; color:#b4c0b5; font-size:12px; }
+    .row { display:flex; gap:8px; }
+    .row input { min-width:0; flex:1; padding:12px; border:1px solid #536c5c; outline:none; background:#050908; color:#e8eadf; font:14px "Courier New",monospace; }
+    button { padding:15px; border:1px solid var(--gold); background:var(--gold); color:#10120e; font:700 12px "Courier New",monospace; letter-spacing:.08em; cursor:pointer; }
+    button:hover { filter:brightness(1.12); }
+    button:disabled { opacity:.6; cursor:wait; }
+    .controls { display:grid; gap:10px; margin-top:14px; }
+    .secondary { background:transparent; color:var(--gold); }
+    .download { border-color:#61877a; color:#bde5d2; }
+    .note { margin:16px 10px 0; color:#77847f; font-size:11px; line-height:1.5; text-align:center; }
+    .note a { color:var(--gold); text-decoration:none; border-bottom:1px solid var(--gold); }
+    @keyframes scan { to { top:100%; } }
+    @keyframes flicker { 50% { filter:brightness(1.35) contrast(1.4); transform:translate(2px,-1px); } }
+    @keyframes ripple { from { transform:scale(.55); opacity:.7; } to { transform:scale(1.3); opacity:0; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <p class="intro"><b>THE SHIELDED POOL IS QUIET.</b><br>303 Bitfoots move without leaving a public trail. The patient hunters do not chase them. They stay quiet long enough to be noticed.</p>
+    <header class="top">SEARCH BITFOOT<small>POOL OBSERVATION // HUNTER RECORD</small></header>
+    <section id="record" class="record">
+      <div class="inner">
+        <div class="tag">303 HIDDEN CREATURES // ZCASH</div>
+        <div class="head">
+          <img id="bitfootImage" src="./assets/main.png" alt="Main Bitfoot head">
+          <i class="scan"></i>
+          <i class="pool-ripple"></i>
+        </div>
+        <h1 id="observation" class="observation">WAITING QUIETLY</h1>
+        <div id="hunterHandle" class="handle">@yourhandle</div>
+        <div class="divider"></div>
+        <div class="grid">
+          <div class="label">MISSION</div><div class="value">BE PATIENT ENOUGH TO BE FOUND</div>
+          <div class="label">POOL STATUS</div><div id="poolStatus" class="value">THE POOL IS QUIET</div>
+          <div class="label">TRAIL</div><div id="trailValue" class="value">NO PUBLIC TRACE</div>
+          <div class="label">HUNTER STATUS</div><div id="hunterStatus" class="value">STILL LISTENING</div>
+        </div>
+        <div class="note-box"><span class="label">FIELD NOTE</span><br><span id="fieldNote">THE HUNTER WAITED WITHOUT MAKING TOO MUCH NOISE.</span></div>
+      </div>
+    </section>
+    <div class="handle-box">
+      <label for="handleInput">PUT YOUR X HANDLE ON THE HUNTER RECORD</label>
+      <div class="row"><input id="handleInput" maxlength="30" placeholder="yourhandle" autocomplete="off"><button id="update">UPDATE</button></div>
+    </div>
+    <div class="controls">
+      <button id="watch">SEARCH FOR A BITFOOT</button>
+      <button id="share" class="secondary">POST MY OBSERVATION</button>
+      <button id="download" class="secondary download">DOWNLOAD RECORD AS JPG</button>
+    </div>
+    <p class="note">Fan-made pool observation. It does not affect the official application. Built by <a href="https://x.com/FJnikoo" target="_blank" rel="noopener noreferrer">@FJnikoo</a>.</p>
+  </main>
+  <script>
+    const $ = id => document.getElementById(id);
+    const pick = list => list[Math.floor(Math.random() * list.length)];
+    const heads = Array.from({ length:18 }, (_, i) => `./assets/bitfoot-head-${String(i + 1).padStart(2, "0")}.png`);
+    const poolMessages = ["SEARCHING THE SHIELDED POOL", "THE OPEN LEDGER SEES NOTHING", "A SHADOW MOVED BETWEEN BLOCKS", "THE TRAIL CLOSED WITHOUT A SOUND", "THE SEARCH REMAINS QUIET", "ONE OF THE 303 MAY BE WATCHING"];
+    const outcomes = ["A BITFOOT LOOKED BACK", "THE POOL REMEMBERED YOU", "SOMETHING NOTICED THE HUNTER", "A SHIELDED SHADOW PAUSED", "THE SEARCH FOUND A MOMENT"];
+    const trails = ["NO PUBLIC TRACE", "SHIELDED BY DESIGN", "NOTHING ON THE OPEN LEDGER", "A FOOTPRINT VANISHED", "THE MAP REFUSED TO HELP"];
+    const statuses = ["STILL LISTENING", "SEARCHING QUIETLY", "PATIENCE OBSERVED", "NOT MAKING TOO MUCH NOISE", "READY IF ALLOWED"];
+    const notes = ["THE HUNTER WAITED WITHOUT MAKING TOO MUCH NOISE.", "NO TRACE WAS LEFT ON THE OPEN LEDGER.", "PATIENCE WAS OBSERVED.", "THE HUNTER DID NOT CHASE THE SIGNAL.", "THE HUNTER UNDERSTOOD THAT SOME THINGS MUST BE ALLOWED.", "THE POOL SAID NOTHING. THAT MAY BE A GOOD SIGN."];
+    const imageElement = $("bitfootImage");
+    let currentHead = null;
+    let isSearching = false;
+    const cachedHeads = heads.map(src => { const image = new Image(); image.src = src; return image; });
+
+    function clean(value) { return value.trim().replace(/^@/, "").replace(/[^a-zA-Z0-9_]/g, "").slice(0, 30); }
+    function updateHandle() {
+      const handle = clean($("handleInput").value) || "yourhandle";
+      $("handleInput").value = handle === "yourhandle" ? "" : handle;
+      $("hunterHandle").textContent = `@${handle}`;
+      localStorage.setItem("bitfootsHunter", handle);
+    }
+    const savedHandle = clean(localStorage.getItem("bitfootsHunter") || "");
+    if (savedHandle) { $("handleInput").value = savedHandle; updateHandle(); }
+
+    function chooseDifferentHead() {
+      let next;
+      do { next = Math.floor(Math.random() * heads.length); } while (next === currentHead);
+      return next;
+    }
+    function showHead(index) {
+      currentHead = index;
+      imageElement.style.opacity = "0";
+      window.setTimeout(() => { imageElement.src = cachedHeads[index].src; imageElement.style.opacity = "1"; }, 45);
+    }
+    async function observe() {
+      if (isSearching) return;
+      isSearching = true;
+      const record = $("record");
+      const button = $("watch");
+      const observation = $("observation");
+      button.disabled = true;
+      record.classList.add("scanning");
+      observation.classList.remove("active");
+      observation.textContent = "SEARCHING QUIETLY";
+      showHead(chooseDifferentHead());
+      let step = 0;
+      const timer = window.setInterval(() => {
+        showHead(chooseDifferentHead());
+        $("poolStatus").textContent = poolMessages[step % poolMessages.length];
+        $("trailValue").textContent = pick(trails);
+        $("fieldNote").textContent = pick(notes);
+        step++;
+      }, 150);
+      await new Promise(resolve => window.setTimeout(resolve, 3200));
+      window.clearInterval(timer);
+      showHead(chooseDifferentHead());
+      record.classList.remove("scanning");
+      observation.textContent = pick(outcomes);
+      observation.classList.add("active");
+      $("poolStatus").textContent = "THE POOL RETURNED TO SILENCE";
+      $("trailValue").textContent = pick(trails);
+      $("hunterStatus").textContent = pick(statuses);
+      $("fieldNote").textContent = pick(notes);
+      button.textContent = "SEARCH AGAIN";
+      button.disabled = false;
+      isSearching = false;
+    }
+    function gameLink() { return location.href.split("?")[0]; }
+    function share() {
+      updateHandle();
+      const text = `Dear @BITFOOTS_,\n\nI tried to find a Bitfoot.\n\nThe pool stayed quiet,\nthe trail vanished,\nand I think that was the point.\n\nStill waiting to be found 👣\n\n${gameLink()}`;
+      window.open(`https://x.com/intent/post?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+    }
+    function drawContainedImage(context, image, x, y, width, height) {
+      const scale = Math.min(width / image.width, height / image.height);
+      const drawWidth = image.width * scale;
+      const drawHeight = image.height * scale;
+      const drawX = x + (width - drawWidth) / 2;
+      const drawY = y + (height - drawHeight) / 2;
+      context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+    }
+    function download() {
+      const width = 900, height = 1240;
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      canvas.width = width; canvas.height = height;
+      const image = new Image();
+      image.onload = () => drawCard(image);
+      image.onerror = () => drawCard(null);
+      image.src = currentHead === null ? "./assets/main.png" : heads[currentHead];
+      function drawCard(headImage) {
+        context.fillStyle = "#0b1219"; context.fillRect(0, 0, width, height);
+        context.strokeStyle = "#42535b"; context.lineWidth = 4; context.strokeRect(20, 20, width - 40, height - 40);
+        context.fillStyle = "#f4bd2a"; context.fillRect(20, 20, width - 40, 10);
+        context.textAlign = "center"; context.fillStyle = "#f4bd2a"; context.font = "bold 62px Impact"; context.fillText("SEARCH BITFOOT", width / 2, 105);
+        context.fillStyle = "#a9b1a9"; context.font = "16px Courier New"; context.fillText("POOL OBSERVATION // HUNTER RECORD", width / 2, 140); context.fillText("303 HIDDEN CREATURES // ZCASH", width / 2, 188);
+        context.fillStyle = "#f0b92b"; context.fillRect(245, 220, 410, 410);
+        if (headImage) { context.imageSmoothingEnabled = false; drawContainedImage(context, headImage, 245, 220, 410, 410); }
+        context.fillStyle = "#f4bd2a"; context.font = "bold 39px Impact"; context.fillText($("observation").textContent, width / 2, 690);
+        context.fillStyle = "#9da7a1"; context.font = "22px Courier New"; context.fillText($("hunterHandle").textContent, width / 2, 730);
+        context.textAlign = "left"; context.strokeStyle = "#66726d"; context.setLineDash([7, 7]); context.beginPath(); context.moveTo(65, 775); context.lineTo(835, 775); context.stroke(); context.setLineDash([]);
+        const rows = [["MISSION", "BE PATIENT ENOUGH TO BE FOUND"], ["POOL STATUS", $("poolStatus").textContent], ["TRAIL", $("trailValue").textContent], ["HUNTER STATUS", $("hunterStatus").textContent]];
+        let y = 830;
+        for (const [label, value] of rows) { context.fillStyle = "#8e9892"; context.font = "16px Courier New"; context.fillText(label, 75, y); context.fillStyle = "#e0dfd1"; context.font = "bold 17px Courier New"; context.textAlign = "right"; context.fillText(value, 825, y); context.textAlign = "left"; y += 54; }
+        context.strokeStyle = "#46534e"; context.strokeRect(65, 1055, 770, 95); context.fillStyle = "#8e9892"; context.font = "16px Courier New"; context.fillText("FIELD NOTE", 85, 1085); context.fillStyle = "#c2cabe"; context.font = "20px Courier New"; context.fillText($("fieldNote").textContent.slice(0, 62), 85, 1125);
+        const link = document.createElement("a"); link.download = "search-bitfoot.jpg"; link.href = canvas.toDataURL("image/jpeg", .94); link.click();
+      }
+    }
+    $("update").onclick = updateHandle;
+    $("handleInput").addEventListener("keydown", event => { if (event.key === "Enter") updateHandle(); });
+    $("watch").onclick = observe;
+    $("share").onclick = share;
+    $("download").onclick = download;
+  </script>
+</body>
+</html>
